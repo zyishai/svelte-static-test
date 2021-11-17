@@ -14,7 +14,15 @@ exports.template = (comp, props) => {
   });
   const renderedPage = template
     .replace(/{{STYLES}}/, styles)
-    .replace(/{{BODY}}/, html);
+    .replace(/{{BODY}}/, html)
+    .replace(
+      /{{SERVER_DATA}}/,
+      `<script>const SERVER_DATA = ${JSON.stringify(props)}</script>`,
+    )
+    .replace(
+      /{{HYDRATABLE_SCRIPT}}/,
+      `<script defer src="/client/_virtual_${comp}.js"></script>`,
+    );
 
   return renderedPage;
 };

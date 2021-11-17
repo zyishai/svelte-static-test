@@ -1,82 +1,73 @@
-import svelte from 'rollup-plugin-svelte';
-import commonjs from '@rollup/plugin-commonjs';
-import resolve from '@rollup/plugin-node-resolve';
-import livereload from 'rollup-plugin-livereload';
-import { terser } from 'rollup-plugin-terser';
-import css from 'rollup-plugin-css-only';
-import { windi } from 'svelte-windicss-preprocess';
+const svelte = require('rollup-plugin-svelte');
+const resolve = require('@rollup/plugin-node-resolve').default;
+const virtual = require('@rollup/plugin-virtual');
+const fs = require('fs');
+const path = require('path');
 
-const production = !process.env.ROLLUP_WATCH;
+const pagesFileNames = fs.readdirSync(path.resolve(__dirname, 'src', 'pages'));
+const pagesPaths = pagesFileNames.map((filename) =>
+  path.join(__dirname, 'src', 'pages', filename),
+);
 
-function serve() {
-  let server;
-
-  function toExit() {
-    if (server) server.kill(0);
-  }
-
-  return {
-    writeBundle() {
-      if (server) return;
-      server = require('child_process').spawn(
-        'npm',
-        ['run', 'start', '--', '--dev'],
-        {
-          stdio: ['ignore', 'inherit', 'inherit'],
-          shell: true,
-        },
-      );
-
-      process.on('SIGTERM', toExit);
-      process.on('exit', toExit);
-    },
-  };
-}
-
-export default {
-  input: 'src/main.js',
+const hydratableScriptsConfigs = pagesFileNames.map((filename) => ({
+  input: filename.replace('.svelte', ''),
   output: {
-    sourcemap: true,
     format: 'iife',
-    name: 'app',
-    file: 'public/build/bundle.js',
+    dir: path.resolve(__dirname, 'client'),
+    entryFileNames: '[name].js',
   },
   plugins: [
+    virtual({
+      [filename.replace('.svelte', '')]: `
+        import ${filename.replace('.svelte', '')} from '${path.join(
+        __dirname,
+        'src',
+        'pages',
+        filename,
+      )}';
+
+        new ${filename.replace('.svelte', '')}({
+          target: document.body,
+          hydratable: true,
+          props: SERVER_DATA
+        });
+      `,
+    }),
     svelte({
-      preprocess: [windi({})],
       compilerOptions: {
-        // enable run-time checks when not in production
-        dev: !production,
+        dev: false,
+        hydratable: true,
       },
     }),
-    // we'll extract any component CSS out into
-    // a separate file - better for performance
-    css({ output: 'bundle.css' }),
-
-    // If you have external dependencies installed from
-    // npm, you'll most likely need these plugins. In
-    // some cases you'll need additional configuration -
-    // consult the documentation for details:
-    // https://github.com/rollup/plugins/tree/master/packages/commonjs
     resolve({
       browser: true,
       dedupe: ['svelte'],
     }),
-    commonjs(),
-
-    // In dev mode, call `npm run start` once
-    // the bundle has been generated
-    !production && serve(),
-
-    // Watch the `public` directory and refresh the
-    // browser on changes when not in production
-    !production && livereload('public'),
-
-    // If we're building for production (npm run build
-    // instead of npm run dev), minify
-    production && terser(),
   ],
-  watch: {
-    clearScreen: false,
+}));
+
+module.exports = [
+  {
+    input: pagesPaths,
+    output: {
+      format: 'cjs',
+      dir: path.resolve(__dirname, 'ssr'),
+      entryFileNames: '[name].js',
+      exports: 'default',
+    },
+    plugins: [
+      svelte({
+        compilerOptions: {
+          dev: false,
+          immutable: true,
+          generate: 'ssr',
+          hydratable: true,
+        },
+      }),
+      resolve({
+        dedupe: ['svelte'],
+      }),
+    ],
   },
-};
+  ...hydratableScriptsConfigs,
+];
