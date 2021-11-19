@@ -10,7 +10,7 @@
 	<a href="/views/about" class="underline text-blue-500">About me</a>
 
 	<p>{count}</p>
-	<button on:click={() => count++}>Increment</button>
+	<button class="bg-emerald-200 px-5 py-3 rounded-lg" on:click={() => count++}>Increment</button>
 	<button on:click={() => count--}>Decrement</button>
 </main>
 

@@ -1,6 +1,3 @@
-require('svelte/register')({
-  hydratable: true,
-});
 const express = require('express');
 const path = require('path');
 const { template } = require('./template');

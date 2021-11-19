@@ -14,7 +14,7 @@ const App = index.create_ssr_component(($$result, $$props, $$bindings, slots) =>
 	<a href="${"/views/about"}" class="${"underline text-blue-500"}">About me</a>
 
 	<p>${index.escape(count)}</p>
-	<button>Increment</button>
+	<button class="${"bg-emerald-200 px-5 py-3 rounded-lg"}">Increment</button>
 	<button>Decrement</button>
 </main>`;
 });

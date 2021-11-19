@@ -1,3 +1,9 @@
+require('svelte/register')({
+  dev: true,
+  immutable: false,
+  generate: 'ssr',
+  hydratable: true,
+});
 const path = require('path');
 const fs = require('fs');
 const { Processor } = require('windicss/lib');

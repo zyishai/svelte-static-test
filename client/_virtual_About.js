@@ -528,7 +528,7 @@
 
     new About({
               target: document.body,
-              hydratable: true,
+              hydrate: true,
               props: SERVER_DATA
             });
 

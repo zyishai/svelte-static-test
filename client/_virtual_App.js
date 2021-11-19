@@ -562,7 +562,7 @@
     			t10 = claim_text(p1_nodes, /*count*/ ctx[1]);
     			p1_nodes.forEach(detach);
     			t11 = claim_space(main_nodes);
-    			button0 = claim_element(main_nodes, "BUTTON", {});
+    			button0 = claim_element(main_nodes, "BUTTON", { class: true });
     			var button0_nodes = children(button0);
     			t12 = claim_text(button0_nodes, "Increment");
     			button0_nodes.forEach(detach);
@@ -580,6 +580,7 @@
     			attr(p0, "class", "text-lg text-gray-700");
     			attr(a1, "href", "/views/about");
     			attr(a1, "class", "underline text-blue-500");
+    			attr(button0, "class", "bg-emerald-200 px-5 py-3 rounded-lg");
     			attr(main, "class", "p-12");
     		},
     		m(target, anchor) {
@@ -652,7 +653,7 @@
 
     new App({
               target: document.body,
-              hydratable: true,
+              hydrate: true,
               props: SERVER_DATA
             });
 

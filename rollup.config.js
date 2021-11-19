@@ -28,7 +28,7 @@ const hydratableScriptsConfigs = pagesFileNames.map((filename) => ({
 
         new ${filename.replace('.svelte', '')}({
           target: document.body,
-          hydratable: true,
+          hydrate: true,
           props: SERVER_DATA
         });
       `,
